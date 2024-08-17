@@ -125,8 +125,8 @@ with tab1:
                                 4:'Customer Name',5:'Customer Number', 6:'Date'})
         
         df_from_db = pd.DataFrame(get_data('Order','order_log'))
-                
-        new_df = df.to_dict("records") if df_from_db.empty else pd.concat([df_from_db, df], ignore_index=True)
+                        
+        new_df = df if df_from_db.empty else pd.concat([df_from_db, df], ignore_index=True)
             
         put_data('Order', new_df.to_dict("records"), 'order_log')
         
