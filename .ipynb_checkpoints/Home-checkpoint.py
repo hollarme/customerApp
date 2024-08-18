@@ -54,7 +54,7 @@ with tab1:
         types_of_product = []
         for b in product_dict:
             if d['Product'] == b['Product']:
-                types_of_product.append((b['Type'],f"{b['Weight(kg)']} kg" if not np.isnan(b['Weight(kg)']) else f"{b['Units']} units",b['Unit Price']))
+                types_of_product.append((b['Type'],f"{b['Weight(kg)']} kg" if not np.isnan(b['Weight(kg)']) else f"{int(b['Units'])} units",b['Unit Price']))
         product_types[d['Product']] = types_of_product
         
     # product_types = {"**Fruits**":['Plantain', 'Breadfruit', 'Pineapple', 'Orange', 'Apple'], 
@@ -76,16 +76,16 @@ with tab1:
 
             for col, product in zip(rows,ptype[1]):
                 tile = col.container(height=370)
-                prod, units, pick = tile.columns([0.4,0.35,0.25], vertical_alignment="center")
-                prod.text(product[0])
+                prod, units, pick = tile.columns([0.35,0.35,0.3], vertical_alignment="center")
+                prod.page_link("https://streamlit.io/gallery", label="{}".format('\n\n'.join(product[0].split('+'))), icon=":material/forward:", help=f'Get more information on our {product[0]}')
                 units.text(f'{product[1]} left')
                 picked = pick.checkbox('select', key='sel '+product[0])
                 
-                tile.page_link("https://streamlit.io/gallery", label=f"{product[0]}", icon=":material/add_circle:", help=f'Get more information on our {product[0]}')
+                # tile.page_link("https://streamlit.io/gallery", label=f"{product[0]}", icon=":material/Foward:", help=f'Get more information on our {product[0]}')
                 
                 # tile.selectbox("Category", ('small', 'medium', 'big'), key='cat '+product, disabled=not picked)
                 unit_p = tile.number_input("Unit Price", value=product[2], key='unit '+product[0], disabled=not picked) # unit price per kg
-                quantity = tile.number_input(f"Quantity({product[1].split(' ')[1]})", key='quant '+product[0], disabled=not picked) # the max_value depends on the total number of the item or kg available 
+                quantity = tile.number_input(f"Quantity({product[1].split(' ')[1]})", value=0.0 if product[1].split(' ')[1]=='kg' else 0 ,key='quant '+product[0], disabled=not picked) # the max_value depends on the total number of the item or kg available 
                 total = tile.number_input("Total Price", value=unit_p*quantity, key='tp '+product[0], disabled=not picked) # a computation of quantity and unit price
                 overall_total += total if picked else 0.0 
                 
