@@ -133,8 +133,8 @@ with tab1:
         df = pd.DataFrame(orders_picked)
         df = df.transpose()
         df = df.reset_index(names='Product')
-        df = df.rename(columns={0:'Unit Price',1:'Qunatity',2:'Total',3:'Payment Method',
-                                4:'Customer Name',5:'Customer Number', 6:'Date'})
+        df = df.rename(columns={0:'Unit Price',1:'Qunatity',2:'Total',3:'Rebate',4:'Payment Method',
+                                5:'Customer Name', 6:'Customer Number', 7:'Date'})
         
         df_from_db = pd.DataFrame(get_data('Order','order_log'))
                         
