@@ -31,6 +31,15 @@ def update_order_table():
         st.session_state["order_df"].drop(st.session_state.orderTable['deleted_rows'], inplace=True)
         put_data('Order', st.session_state["order_df"].to_dict("records"), 'order_log')
 
+@st.dialog("Price Change")
+def rebate(key, price):
+    st.write(f'The new value is:{st.session_state[key]}')
+    # update rebate check box
+    ksplit = key.split(' ')
+    a = ksplit[0]
+    b = ' '.join(ksplit[1:])
+    st.warning(f'Are you giving a rebate on the {a} price for {b}? If so check the rebate box for {b}', icon="⚠️")
+
 tab1, tab2 = st.tabs(["Order", "Log"])
 
 with tab1:
@@ -75,8 +84,8 @@ with tab1:
             rows = st.columns(div)*int(len(ptype[1])/div) if not len(ptype[1])%div else st.columns(div)*(int(len(ptype[1])/div)+1)
 
             for col, product in zip(rows,ptype[1]):
-                tile = col.container(height=370)
-                prod, units, pick = tile.columns([0.35,0.35,0.3], vertical_alignment="center")
+                tile = col.container(height=400)
+                prod, units, pick = tile.columns([0.5,0.3,0.2], vertical_alignment="center")
                 prod.page_link("https://streamlit.io/gallery", label="{}".format('\n\n'.join(product[0].split('+'))), icon=":material/forward:", help=f'Get more information on our {product[0]}')
                 units.text(f'{product[1]} left')
                 picked = pick.checkbox('select', key='sel '+product[0])
@@ -84,24 +93,27 @@ with tab1:
                 # tile.page_link("https://streamlit.io/gallery", label=f"{product[0]}", icon=":material/Foward:", help=f'Get more information on our {product[0]}')
                 
                 # tile.selectbox("Category", ('small', 'medium', 'big'), key='cat '+product, disabled=not picked)
-                unit_p = tile.number_input("Unit Price", value=product[2], key='unit '+product[0], disabled=not picked) # unit price per kg
-                quantity = tile.number_input(f"Quantity({product[1].split(' ')[1]})", value=0.0 if product[1].split(' ')[1]=='kg' else 0 ,key='quant '+product[0], disabled=not picked) # the max_value depends on the total number of the item or kg available 
-                total = tile.number_input("Total Price", value=unit_p*quantity, key='tp '+product[0], disabled=not picked) # a computation of quantity and unit price
+                unit_p = tile.number_input("Unit Price", value=product[2], key='unit '+product[0], disabled=not picked, on_change=rebate, max_value=product[2], args=['unit '+product[0], product[2]]) # unit price per kg
+                quantity = tile.number_input(f"Quantity({product[1].split(' ')[1]})", value=0.0 if product[1].split(' ')[1]=='kg' else 0 ,key='quant '+product[0], disabled=not picked, max_value=eval(product[1].split(' ')[0])) # the max_value depends on the total number of the item or kg available 
+                total = tile.number_input("Total Price", value=unit_p*quantity, key='total '+product[0], disabled=not picked, on_change=rebate, args=['total '+product[0], unit_p*quantity]) # a computation of quantity and unit price
+                reb = tile.checkbox('rebate', key='reb '+product[0], value=False, disabled=not picked)
+                
                 overall_total += total if picked else 0.0 
                 
                 if picked:
-                    orders_picked.update({product[0]:[unit_p, quantity, total]})
+                    orders_picked.update({product[0]:[unit_p, quantity, total, reb]})
                 elif not picked:
                     orders_picked.pop(product[0], [])
 
-    st.number_input("Overall Total", value=overall_total)
+    st.number_input("Overall Total", value=overall_total, key='ovt', on_change=rebate, args=['ovt', st])
+    st.checkbox('rebate', key='reb ovt', value=False, disabled=False)
     
     f'The overall cost of your order is: N{prettify(overall_total)}'
     
     paymode = st.selectbox("Payment mode", ('POS', 'Transfer', 'Cash', 'PayMeLater'), key='paymode')
     
     with st.popover('Order Summary', disabled=True if not orders_picked else False):
-        df = pd.DataFrame(orders_picked, index=['Unit Price(N)',f'Qunatity(units/kg)','Total(N)'])
+        df = pd.DataFrame(orders_picked, index=['Unit Price(N)',f'Qunatity(units/kg)','Total(N)', 'Rebate'])
         st.dataframe(df)
         
     _,refresh = st.columns(2)
