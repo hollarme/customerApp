@@ -38,7 +38,7 @@ def update_product_table():
             st.session_state["data_df"].drop(st.session_state.prolistTable['deleted_rows'], inplace=True)
             put_data('Order', st.session_state["data_df"].to_dict("records"), 'order_log')
 
-@st.dialog("Price Change")
+# @st.dialog("Price Change")
 def rebate(key, price):
     st.write(f'The new value is:{st.session_state[key]}')
     # update rebate check box
