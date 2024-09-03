@@ -6,7 +6,7 @@ import pandas as pd
 from utils import init_connection, get_data, put_data
 from datetime import datetime
 import numpy as np
-from mitosheet.streamlit.v1 import spreadsheet
+# from mitosheet.streamlit.v1 import spreadsheet
 import random
 
 
@@ -177,8 +177,9 @@ with tab2:
             st.session_state["order_df"] = st.data_editor(pd.DataFrame(get_data('Order','order_log')), num_rows="dynamic", key="orderTable", on_change=update_order_table)
             
         elif interface == "MitoSheet Interface":
-            dataframe, code = spreadsheet(st.session_state["order_df"])
-            st.code(code)
+            pass
+            # dataframe, code = spreadsheet(st.session_state["order_df"])
+            # st.code(code)
         
         
 with tab3:
