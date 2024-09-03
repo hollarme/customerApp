@@ -220,7 +220,7 @@ with tab3:
                 "Units": st.column_config.NumberColumn(default=None),
                 "Unit Price":st.column_config.NumberColumn(default=0.0),
                 "Date": st.column_config.DateColumn(required=True, default=datetime.date(datetime.now())),
-                # "Note": st.column_config.TextColumn()
+                "Note": st.column_config.TextColumn()
             },
 
             num_rows="dynamic",
