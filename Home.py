@@ -97,7 +97,7 @@ with tab1:
                 # st.write(product[1]==None)
                 tile = col.container(height=400)
                 prod, units, pick = tile.columns([0.5,0.3,0.2])
-                prod.page_link("https://streamlit.io/gallery", label="{} ({})".format('\n\n'.join(product[0].split('+')), product[1]), icon=":material/forward:", help=f'Get more information on our {product[0]}')
+                prod.page_link("https://streamlit.io/gallery", label="{} ({})".format('\n\n'.join(product[0].split('+')), product[1]), icon="➰", help=f'Get more information on our {product[0]}')
                 units.text(f'{product[2]} left')
                 picked = pick.checkbox('select', key='sel '+product[0] if product[1]==None else 'sel '+product[0]+product[1])
                 
