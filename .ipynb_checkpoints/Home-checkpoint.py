@@ -126,9 +126,9 @@ with tab1:
     
     paymode = st.selectbox("Payment mode", ('POS', 'Transfer', 'Cash', 'PayMeLater'), key='paymode')
     
-    with st.popover('Order Summary', disabled=True if not orders_picked else False):
-        df = pd.DataFrame(orders_picked, index=['Unit Price(N)',f'Qunatity(units/kg)','Total(N)', 'Rebate'])
-        st.dataframe(df)
+    # with st.popover('Order Summary', disabled=True if not orders_picked else False):
+    #     df = pd.DataFrame(orders_picked, index=['Unit Price(N)',f'Qunatity(units/kg)','Total(N)', 'Rebate'])
+    #     st.dataframe(df)
         
     _,refresh = st.columns(2)
         
