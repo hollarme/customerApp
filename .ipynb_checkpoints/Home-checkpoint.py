@@ -51,7 +51,7 @@ tab1, tab2, tab3 = st.tabs(["Order", "Log", "Product"])
 
 with tab1:
     
-    title,refresh = st.columns(2, vertical_alignment="bottom")
+    title,refresh = st.columns(2)
     
     title.header('Take Order')
 
@@ -96,7 +96,7 @@ with tab1:
             for col, product in zip(rows,ptype[1]):
                 # st.write(product[1]==None)
                 tile = col.container(height=400)
-                prod, units, pick = tile.columns([0.5,0.3,0.2], vertical_alignment="center")
+                prod, units, pick = tile.columns([0.5,0.3,0.2])
                 prod.page_link("https://streamlit.io/gallery", label="{} ({})".format('\n\n'.join(product[0].split('+')), product[1]), icon=":material/forward:", help=f'Get more information on our {product[0]}')
                 units.text(f'{product[2]} left')
                 picked = pick.checkbox('select', key='sel '+product[0] if product[1]==None else 'sel '+product[0]+product[1])
