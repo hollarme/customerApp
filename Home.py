@@ -73,7 +73,10 @@ with tab1:
         types_of_product = []
         for b in product_dict:
             if d['Product'] == b['Product']:
-                types_of_product.append((b['Type'], b['Tag'], f"{b['Weight(kg)']} kg" if not np.isnan(b['Weight(kg)']) else f"{int(b['Units'])} units",b['Unit Price']))
+                try:
+                    types_of_product.append((b['Type'], b['Tag'], f"{b['Weight(kg)']} kg" if not np.isnan(b['Weight(kg)']) else f"{int(b['Units'])} units",b['Unit Price']))
+                except ValueError:
+                    pass
         product_types[d['Product']] = types_of_product
         
     # product_types = {"**Fruits**":['Plantain', 'Breadfruit', 'Pineapple', 'Orange', 'Apple'], 
@@ -88,36 +91,39 @@ with tab1:
     div = 3
     
     orders_picked = {}
+    
+    #.format('\n\n'.join(product[0].split('+')), product[1])
 
     for ptype in product_types.items():
-        with st.expander(ptype[0], expanded=False):
-            rows = st.columns(div)*int(len(ptype[1])/div) if not len(ptype[1])%div else st.columns(div)*(int(len(ptype[1])/div)+1)
+        if len(ptype[1]) != 0:
+            with st.expander(ptype[0], expanded=False):
+                rows = st.columns(div)*int(len(ptype[1])/div) if not len(ptype[1])%div else st.columns(div)*(int(len(ptype[1])/div)+1)
 
-            for col, product in zip(rows,ptype[1]):
-                # st.write(product[1]==None)
-                tile = col.container(height=400)
-                prod, units, pick = tile.columns([0.5,0.3,0.2])
-                prod.page_link("https://streamlit.io/gallery", label="{} ({})".format('\n\n'.join(product[0].split('+')), product[1]), icon="➰", help=f'Get more information on our {product[0]}')
-                units.text(f'{product[2]} left')
-                picked = pick.checkbox('select', key='sel '+product[0] if product[1]==None else 'sel '+product[0]+product[1])
-                
-                # tile.page_link("https://streamlit.io/gallery", label=f"{product[0]}", icon=":material/Foward:", help=f'Get more information on our {product[0]}')
-                
-                # tile.selectbox("Category", ('small', 'medium', 'big'), key='cat '+product, disabled=not picked)
-                unit_p = tile.number_input("Unit Price", value=product[3], key='unit '+product[0] if product[1]==None else 'unit '+product[0]+product[1], disabled=not picked, on_change=rebate, max_value=product[3], args=['unit '+product[0] if product[1]==None else 'unit '+product[0]+product[1], product[3]]) # unit price per kg
-                
-                quantity = tile.number_input(f"Quantity({product[2].split(' ')[1]})", value=0.0 if product[2].split(' ')[1]=='kg' else 0 ,key='quant '+product[0] if product[1]==None else 'quant '+product[0]+product[1], disabled=not picked, max_value=eval(product[2].split(' ')[0])) # the max_value depends on the total number of the item or kg available 
-                
-                total = tile.number_input("Total Price", value=unit_p*quantity, key='total '+product[0] if product[1]==None else 'total '+product[0]+product[1], disabled=not picked, on_change=rebate, args=['total '+product[0] if product[1]==None else 'total '+product[0]+product[1], unit_p*quantity]) # a computation of quantity and unit price
-                
-                reb = tile.checkbox('rebate', key='reb '+product[0] if product[1]==None else 'reb '+product[0]+product[1], value=False, disabled=not picked)
-                
-                overall_total += total if picked else 0.0 
-                
-                if picked:
-                    orders_picked.update({f"{product[0]}({product[1]})":[unit_p, quantity, total, reb]})
-                elif not picked:
-                    orders_picked.pop(f"{product[0]}({product[1]})", [])
+                for col, product in zip(rows,ptype[1]):
+                    # st.write(product[1]==None)
+                    tile = col.container(height=400)
+                    prod, units, pick = tile.columns([0.5,0.3,0.2])
+                    prod.page_link("https://streamlit.io/gallery", label=f"{(chr(10)*2).join(product[0].split('+'))} {'('+product[1]+')' if product[1] else ''}", icon="➰", help=f'Get more information on our {product[0]}')
+                    units.text(f'{product[2]} left')
+                    picked = pick.checkbox('select', key='sel '+product[0] if product[1]==None else 'sel '+product[0]+product[1])
+
+                    # tile.page_link("https://streamlit.io/gallery", label=f"{product[0]}", icon=":material/Foward:", help=f'Get more information on our {product[0]}')
+
+                    # tile.selectbox("Category", ('small', 'medium', 'big'), key='cat '+product, disabled=not picked)
+                    unit_p = tile.number_input("Unit Price", value=product[3], key='unit '+product[0] if product[1]==None else 'unit '+product[0]+product[1], disabled=not picked, on_change=rebate, max_value=product[3], args=['unit '+product[0] if product[1]==None else 'unit '+product[0]+product[1], product[3]]) # unit price per kg
+
+                    quantity = tile.number_input(f"Quantity({product[2].split(' ')[1]})", value=0.0 if product[2].split(' ')[1]=='kg' else 0 ,key='quant '+product[0] if product[1]==None else 'quant '+product[0]+product[1], disabled=not picked, max_value=eval(product[2].split(' ')[0])) # the max_value depends on the total number of the item or kg available 
+
+                    total = tile.number_input("Total Price", value=unit_p*quantity, key='total '+product[0] if product[1]==None else 'total '+product[0]+product[1], disabled=not picked, on_change=rebate, args=['total '+product[0] if product[1]==None else 'total '+product[0]+product[1], unit_p*quantity]) # a computation of quantity and unit price
+
+                    reb = tile.checkbox('rebate', key='reb '+product[0] if product[1]==None else 'reb '+product[0]+product[1], value=False, disabled=not picked)
+
+                    overall_total += total if picked else 0.0 
+
+                    if picked:
+                        orders_picked.update({f"{product[0]}({product[1]})":[unit_p, quantity, total, reb]})
+                    elif not picked:
+                        orders_picked.pop(f"{product[0]}({product[1]})", [])
 
     st.number_input("Overall Total", value=overall_total, key='ovt', on_change=rebate, args=['ovt', st])
     st.checkbox('rebate', key='reb ovt', value=False, disabled=False)
